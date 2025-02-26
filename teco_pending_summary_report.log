@@ -1,0 +1,26 @@
+Script started at 26-12-2024 10:10:00.63 
+Running: smtp_send_summary_report_pending_teco_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Error: SMTP Error: Could not connect to SMTP host. Failed to connect to serverScript started at 02-01-2025 10:10:00.57 
+Running: smtp_send_summary_report_pending_teco_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sending failed: SMTP Error: Could not connect to SMTP host. Failed to connect to serverSMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.office365.com failed: No such host is known. . Retrying...Email sending failed: SMTP Error: Could not connect to SMTP host. Failed to connect to serverSMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.office365.com failed: No such host is known. . Retrying...Email sending failed: SMTP Error: Could not connect to SMTP host. Failed to connect to serverSMTP server error: Failed to connect to server Additional SMTP info: php_network_getaddresses: getaddrinfo for smtp.office365.com failed: No such host is known. . Retrying...Email sent successfully.Excel file deleted successfully.Script started at 16-01-2025 10:10:00.40 
+Running: smtp_send_summary_report_pending_teco_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sent successfully.Excel file deleted successfully.Script started at 30-01-2025 10:10:00.71 
+Running: smtp_send_summary_report_pending_teco_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Error: Invalid address:  (to):  Rajanna.Adepu@suzlon.comScript started at 13-02-2025 10:11:00.64 
+Running: smtp_send_summary_report_pending_teco_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Error: Invalid address:  (to):  Rajanna.Adepu@suzlon.com

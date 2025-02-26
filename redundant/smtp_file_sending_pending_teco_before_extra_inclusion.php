@@ -1,0 +1,247 @@
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+// Include necessary libraries and PHPMailer autoload
+require './vendor/autoload.php';
+include './components/connect5.php'; // Include your PDO connection
+require './PhpSpreadSheet/AnyFolder/PhpOffice/autoload.php'; // Load PhpSpreadsheet
+
+$financialYear = $_GET['financial_year'] ?? 'FY 2024-2025';
+
+$startDate = '2024-03-31';
+$endDate = '2025-04-01';
+
+// Step 1: Fetch existing order numbers from the dispute table
+$existingOrderQuery = "SELECT [Order No] FROM [NewDatabase].[dbo].[reason_for_dispute_and_pending_teco]";
+$existingOrderStmt = $db->query($existingOrderQuery);
+$existingOrders = $existingOrderStmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Step 1: Generate Excel file
+
+// Set timezone
+date_default_timezone_set('Asia/Kolkata');
+
+// Fetch today's date
+$currentDate = date('Y-m-d');
+
+// Create new Spreadsheet object
+$spreadsheet = new Spreadsheet();
+
+// // Fetch Site Area Incharge Mapping Information
+// $siteMappingQuery = "SELECT [SITE], [STATE ENGG HEAD], [AREA INCHARGE], [SITE INCHARGE], [STATE PMO] 
+//     FROM [NewDatabase].[dbo].[site_area_incharge_mapping]";
+
+$siteMappingQuery = "SELECT distinct [SITE], [STATE ENGG HEAD], [AREA INCHARGE], [SITE INCHARGE], [STATE PMO] 
+    FROM [NewDatabase].[dbo].[site_area_incharge_mapping]";
+
+$siteMappingStmt = $db->query($siteMappingQuery);
+$siteMappings = $siteMappingStmt->fetchAll(PDO::FETCH_ASSOC);
+$siteMapping = [];
+foreach ($siteMappings as $mapping) {
+    $siteMapping[$mapping['SITE']] = $mapping;
+}
+
+$spreadsheet->getActiveSheet()->setTitle('Pending Teco');
+
+// Fetch Pending Teco data from oil change and dispute tables
+$pendingTecoTables = ['gb_oil_change_all_orders', 'PD_OIL_CHG_ORDER_all_orders', 'YD_OIL_CHG_ORDER_all_orders', 'fc_oil_change_all_orders', 'dispute_all_orders'];
+$pendingTecoRows = [];
+
+// Define the columns to fetch
+$columnsToFetch = [
+    '[Order No]',
+    '[Function Loc]',
+    '[Issue]',
+    'TRY_CAST([Return] AS FLOAT) AS [Return]',  // Convert varchar to float
+    '[Return Percentage]',
+    '[Plant]',
+    '[State]',
+    '[Area]',
+    '[Site]',
+    '[Material]',
+    '[Storage Location]',
+    '[Move Type]',
+    '[Material Document]',
+    '[Description]',
+    '[Val Type]',
+    '[Posting Date]',
+    '[Entry Date]',
+    '[Quantity]',
+    '[Order Type]',
+    '[Component]',
+    '[WTG Model]',
+    '[Order]',
+    '[Order Status]',
+    '[Current Oil Change Date]'
+];
+
+// Loop through the Pending Teco tables
+// Loop through the Pending Teco tables
+foreach ($pendingTecoTables as $table) {
+    // Prepare the column list for the SELECT statement
+    $columnsList = implode(", ", $columnsToFetch);
+    
+    $query = "
+    SELECT $columnsList FROM $table 
+    WHERE [Order Status] IN ('Released', 'In Process')
+    AND [Posting Date] >= '2024-03-31' 
+    AND [Posting Date] <= '2025-04-01'
+    AND [date_of_insertion] = :currentDate";
+
+    // Prepare and execute the query
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':currentDate', $currentDate);
+    $stmt->execute();
+    
+    // Fetch rows from the current table
+    $fetchedRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Filter out rows with existing order numbers
+    foreach ($fetchedRows as $row) {
+        if (!in_array($row['Order No'], $existingOrders)) {
+            $pendingTecoRows[] = $row; // Only include rows that don't match existing orders
+        }
+    }
+}
+
+// Write the Pending Teco data into the sheet
+$sheet = $spreadsheet->getActiveSheet();
+if (!empty($pendingTecoRows)) {
+    // Set the header row
+    $headers = array_keys($pendingTecoRows[0]);
+    
+    // Add additional incharge headers
+    $headers[] = 'STATE ENGG HEAD';
+    $headers[] = 'AREA INCHARGE';
+    $headers[] = 'SITE INCHARGE';
+    $headers[] = 'STATE PMO';
+
+    // Write headers to the first row
+    foreach ($headers as $columnIndex => $header) {
+        $sheet->setCellValueByColumnAndRow($columnIndex + 1, 1, $header);
+    }
+
+    // Populate data rows
+// Step 1: Group data by unique combinations of Area Incharge, Site Incharge, and State PMO
+$groupedData = [];
+foreach ($pendingTecoRows as $row) {
+    $stateEnggHead = $siteMapping[$row['Site']]['STATE ENGG HEAD'] ?? null;
+    $areaIncharge = $siteMapping[$row['Site']]['AREA INCHARGE'] ?? null;
+    $siteIncharge = $siteMapping[$row['Site']]['SITE INCHARGE'] ?? null;
+    $statePmo = $siteMapping[$row['Site']]['STATE PMO'] ?? null;
+
+    $key = "{$areaIncharge}_{$siteIncharge}_{$statePmo}";
+
+    if (!isset($groupedData[$key])) {
+        $groupedData[$key] = [
+            'rows' => [],
+            'stateEnggHead' => $stateEnggHead,
+            'areaIncharge' => $areaIncharge,
+            'siteIncharge' => $siteIncharge,
+            'statePmo' => $statePmo
+        ];
+    }
+    $groupedData[$key]['rows'][] = $row;
+}
+
+// Step 2: For each group, create a separate Excel file and send an email
+foreach ($groupedData as $group) {
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Pending Teco');
+
+    // Set headers
+    $headers = array_keys($pendingTecoRows[0]);
+    $headers = array_merge($headers, ['STATE ENGG HEAD', 'AREA INCHARGE', 'SITE INCHARGE', 'STATE PMO']);
+    foreach ($headers as $columnIndex => $header) {
+        $sheet->setCellValueByColumnAndRow($columnIndex + 1, 1, $header);
+    }
+
+    // Populate data rows
+    foreach ($group['rows'] as $rowIndex => $row) {
+        $colIndex = 1;
+        // foreach ($row as $key => $cellValue) {
+        //     if ($key !== 'rn') {
+        //         $sheet->setCellValueByColumnAndRow($colIndex++, $rowIndex + 2, $cellValue);
+        //     }
+        // }
+                // Write each field to the sheet
+foreach ($row as $key => $cellValue) {
+    if ($key !== 'rn') { // Skip 'rn' column from being written
+
+        // Handle case where 'Order Type' is NULL or blank
+        if ($key === 'Order Type' && (is_null($cellValue) || trim($cellValue) === '') && !empty($row['Order'])) {
+            $cellValue = $row['Order']; // Set 'Order Type' to the value of 'Order'
+        }
+
+        // Check if the column is a date field and format accordingly
+        if (in_array($key, ['Posting Date', 'Entry Date', 'Current Oil Change Date'])) {
+            $formattedDate = \PhpOffice\PhpSpreadsheet\Shared\Date::stringToExcel(date('d-m-Y', strtotime($cellValue)));
+            $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex + 2, $formattedDate);
+            $sheet->getStyleByColumnAndRow($colIndex, $rowIndex + 2)->getNumberFormat()->setFormatCode('DD/MM/YYYY');
+        } else {
+            $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex + 2, $cellValue); // Start writing from the second row
+        }
+        $colIndex++; // Move to the next column
+    }
+}
+        // Add incharge data
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowIndex + 2, $group['stateEnggHead']);
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowIndex + 2, $group['areaIncharge']);
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowIndex + 2, $group['siteIncharge']);
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowIndex + 2, $group['statePmo']);
+    }
+
+    // Save Excel file
+    $filePath = "pending_teco_{$group['areaIncharge']}_{$group['siteIncharge']}_{$group['statePmo']}.xlsx";
+    $writer = new Xlsx($spreadsheet);
+    $writer->save($filePath);
+
+    // Send email
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.office365.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'SVC_OMSApplications@suzlon.com';
+        $mail->Password = 'Suzlon@123';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Sender and recipients
+        $mail->setFrom('SVC_OMSApplications@suzlon.com', 'Suzlon OMS Applications');
+        // $mail->addAddress($group['areaIncharge']);
+        // $mail->addAddress($group['siteIncharge']);
+        // $mail->addAddress($group['statePmo']);
+         $mail->addAddress($group['extra']); 
+
+        $mail->addAddress('meet.somaiya@suzlon.com');
+        // $mail->addCC('meet.somaiya@suzlon.com');
+        // $mail->addAddress('manish.jaiswal@suzlon.com');
+        // $mail->addAddress('abhishek.devarkar@suzlon.com');
+
+            // Email subject and body
+    $mail->Subject = 'DO TECO PENDING GB FC YDPD OIL CHANGE ORDER IMMEDAITELY ';
+    $mail->Body = "Respective AIC, SI & PMO,\n\nPlease find the attached file that contains suspect locations where the physical oil change was done but TECO is pending.\nKindly complete the TECO of the oil change order by the end of today if the physical oil change was done.\n\nNOTE  If you encounter an error during the SAP-TECO process, please send an email with the error snapshot to Mr. Rahul Raut (rahul.raut@suzlon.com) & Mr. Harshvardhan (sbatech17@suzlon.com).\n\n1. GI DONE.\n2. USED OIL RETURNED TO SYSTEM.\n3. SAP OIL CHANGE PROCESS PENDING.\n4. GOODS MOVEMENT DONE.";
+
+    // $mail->Body = "Respective AIC, SI & PMO,\n\nPlease find the attached file that contains suspect locations where the physical oil change was done but TECO is pending.\nKindly complete the TECO of the oil change order by the end of today if the physical oil change was done.\n\nPlease refer to SOP on this given link ==> http://10.102.0.192:778/admins/sop_for_consumption_analysis.php\n\nNOTE  If you encounter an error during the SAP-TECO process, please send an email with the error snapshot to Mr. Rahul Raut (rahul.raut@suzlon.com) & Mr. Harshvardhan (sbatech17@suzlon.com).\n\n1. GI DONE.\n2. USED OIL RETURNED TO SYSTEM.\n3. SAP OIL CHANGE PROCESS PENDING.\n4. GOODS MOVEMENT DONE.";
+
+        // Attach Excel file
+        $mail->addAttachment($filePath);
+
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+
+    // Optionally, delete the file after sending if not needed on server
+    unlink($filePath);
+}
+
+}
+
+?>

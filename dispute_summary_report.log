@@ -1,0 +1,85 @@
+Script started at 15-01-2025 10:10:00.61 
+Running: smtp_send_summary_report_dispute_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sent successfully.Excel file deleted successfully.Script started at 29-01-2025 10:10:00.85 
+Running: smtp_send_summary_report_dispute_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sent successfully.Excel file deleted successfully.Script started at 12-02-2025 10:11:01.33 
+Running: smtp_send_summary_report_dispute_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sent successfully.Excel file deleted successfully.Script started at 26-02-2025 10:11:01.10 
+Running: smtp_send_summary_report_dispute_new_one_manish.php 
+PHP Warning:  session_start(): Session cannot be started after headers have already been sent in D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php on line 5
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+Invalid email skipped: NA
+<br />
+<b>Warning</b>:  session_start(): Session cannot be started after headers have already been sent in <b>D:\xampp2\htdocs\LUBRICATION PORTAL SMTP\components\connect5.php</b> on line <b>5</b><br />
+Excel report created successfully.Email sent successfully.Excel file deleted successfully.
